@@ -1,45 +1,86 @@
-import User from "../models/user.model.js";
-import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
+import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 
 export const getAnalyticsData = async () => {
-  const users = await User.countDocuments();
-  const products = await Product.countDocuments();
+	const totalUsers = await User.countDocuments();
+	const totalProducts = await Product.countDocuments();
 
-  const salesAgg = await Order.aggregate([
-    { $group: { _id: null, totalSales: { $sum: 1 }, totalRevenue: { $sum: "$totalAmount" } } }
-  ]);
+	const salesData = await Order.aggregate([
+		{
+			$group: {
+				_id: null, // it groups all documents together,
+				totalSales: { $sum: 1 },
+				totalRevenue: { $sum: "$totalAmount" },
+			},
+		},
+	]);
 
-  const { totalSales = 0, totalRevenue = 0 } = salesAgg[0] || {};
-  return { users, products, totalSales, totalRevenue };
+	const { totalSales, totalRevenue } = salesData[0] || { totalSales: 0, totalRevenue: 0 };
+
+	return {
+		users: totalUsers,
+		products: totalProducts,
+		totalSales,
+		totalRevenue,
+	};
 };
 
 export const getDailySalesData = async (startDate, endDate) => {
-  const daily = await Order.aggregate([
-    { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-    {
-      $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-        sales: { $sum: 1 },
-        revenue: { $sum: "$totalAmount" },
-      },
-    },
-    { $sort: { _id: 1 } },
-  ]);
+	try {
+		const dailySalesData = await Order.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: startDate,
+						$lte: endDate,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+					sales: { $sum: 1 },
+					revenue: { $sum: "$totalAmount" },
+				},
+			},
+			{ $sort: { _id: 1 } },
+		]);
 
-  const dates = getDatesInRange(startDate, endDate);
-  return dates.map(date => {
-    const found = daily.find(d => d._id === date);
-    return { date, sales: found?.sales || 0, revenue: found?.revenue || 0 };
-  });
+		// example of dailySalesData
+		// [
+		// 	{
+		// 		_id: "2024-08-18",
+		// 		sales: 12,
+		// 		revenue: 1450.75
+		// 	},
+		// ]
+
+		const dateArray = getDatesInRange(startDate, endDate);
+		// console.log(dateArray) // ['2024-08-18', '2024-08-19', ... ]
+
+		return dateArray.map((date) => {
+			const foundData = dailySalesData.find((item) => item._id === date);
+
+			return {
+				date,
+				sales: foundData?.sales || 0,
+				revenue: foundData?.revenue || 0,
+			};
+		});
+	} catch (error) {
+		throw error;
+	}
 };
 
 function getDatesInRange(startDate, endDate) {
-  const out = [];
-  const cur = new Date(startDate);
-  while (cur <= endDate) {
-    out.push(cur.toISOString().split("T")[0]);
-    cur.setDate(cur.getDate() + 1);
-  }
-  return out;
+	const dates = [];
+	let currentDate = new Date(startDate);
+
+	while (currentDate <= endDate) {
+		dates.push(currentDate.toISOString().split("T")[0]);
+		currentDate.setDate(currentDate.getDate() + 1);
+	}
+
+	return dates;
 }

@@ -18,11 +18,9 @@ export const useUserStore = create((set, get) => ({
 		try {
 			const res = await axios.post("/auth/signup", { name, email, password });
 			set({ user: res.data, loading: false });
-			return true;
 		} catch (error) {
 			set({ loading: false });
 			toast.error(error.response.data.message || "An error occurred");
-			return false;
 		}
 	},
 	login: async (email, password) => {
@@ -30,23 +28,25 @@ export const useUserStore = create((set, get) => ({
 
 		try {
 			const res = await axios.post("/auth/login", { email, password });
+
 			set({ user: res.data, loading: false });
-			return true;
 		} catch (error) {
 			set({ loading: false });
 			toast.error(error.response.data.message || "An error occurred");
-			return false;
 		}
 	},
 
 	logout: async () => {
 		try {
-			await axios.post("/auth/logout");
-			set({ user: null });
+		  await axios.post("/auth/logout");
 		} catch (error) {
-			toast.error(error.response?.data?.message || "An error occurred during logout");
+		  toast.error(error.response?.data?.message || "Logout request failed");
+		} finally {
+		  // Always clear user locally so the UI updates
+		  set({ user: null });
 		}
-	},
+	  },
+	  
 
 	checkAuth: async () => {
 		set({ checkingAuth: true });
@@ -75,7 +75,8 @@ export const useUserStore = create((set, get) => ({
 	},
 }));
 
-// Implement the axios interceptors for refreshing access token
+// TODO: Implement the axios interceptors for refreshing access token
+
 // Axios interceptor for token refresh
 let refreshPromise = null;
 

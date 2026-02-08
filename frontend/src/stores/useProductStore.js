@@ -34,17 +34,12 @@ export const useProductStore = create((set) => ({
 		set({ loading: true });
 		try {
 			const response = await axios.get(`/products/category/${category}`);
-			
-			// 🔍 Add this line to inspect what your backend returns
-			console.log("Category API response:", response.data);
-	
-			set({ products: response.data.products, loading: false }); // <- maybe incorrect
+			set({ products: response.data.products, loading: false });
 		} catch (error) {
 			set({ error: "Failed to fetch products", loading: false });
 			toast.error(error.response.data.error || "Failed to fetch products");
 		}
 	},
-	
 	deleteProduct: async (productId) => {
 		set({ loading: true });
 		try {
