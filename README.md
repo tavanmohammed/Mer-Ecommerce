@@ -201,3 +201,6 @@ npm run dev
 * Pagination & search
 * Deployment (Docker / AWS / Vercel)
 
+Screenshot 2026-02-08 at 4.14.58 PM
+
+
