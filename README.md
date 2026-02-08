@@ -223,6 +223,8 @@ npm run dev
 
 <img width="1426" height="778" alt="Screenshot 2026-02-08 at 4 18 37 PM" src="https://github.com/user-attachments/assets/945d07eb-504e-4085-9822-8658016cd213" />
 
+Admin account
+
 <img width="1440" height="777" alt="Screenshot 2026-02-08 at 4 19 24 PM" src="https://github.com/user-attachments/assets/bf3b7693-7565-4aed-b474-8ae28b55ee22" />
 
 <img width="1428" height="778" alt="Screenshot 2026-02-08 at 4 19 43 PM" src="https://github.com/user-attachments/assets/872d3809-f4dc-4e41-b399-f299d7be673b" />
