@@ -1,7 +1,4 @@
-Here’s a **clean, professional README** you can copy-paste directly into `README.md` for your project.
-It’s written clearly, recruiter-friendly, and matches **exactly what you built**.
 
----
 
 # 🛒 MER E-Commerce Platform
 
